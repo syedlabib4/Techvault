@@ -6,42 +6,23 @@
   style="
     --section-bg: {{ section.settings.background_color }};
     --card-bg: {{ section.settings.card_background }};
-    --card-radius: {{ section.settings.card_radius }}px;
     --card-gap: {{ section.settings.card_gap }}px;
+    --card-radius: {{ section.settings.card_radius }}px;
     --card-padding: {{ section.settings.card_padding }}px;
     --image-height: {{ section.settings.image_height }}px;
-    --title-color: {{ section.settings.title_color }};
-    --product-title-color: {{ section.settings.product_title_color }};
+    --title-color: {{ section.settings.product_title_color }};
     --price-color: {{ section.settings.price_color }};
-    --accent-color: {{ section.settings.accent_color }};
-    --shadow-opacity: {{ section.settings.shadow_opacity | divided_by: 100.0 }};
+    --curtain-color: {{ section.settings.curtain_color }};
+    --curtain-text: {{ section.settings.curtain_text_color }};
+    --curtain-speed: {{ section.settings.animation_duration }}s;
   "
 >
 
   <div class="trending-products__container">
 
-    {% if section.settings.show_heading %}
-      <div class="trending-products__header">
-
-        {% if section.settings.eyebrow != blank %}
-          <span class="trending-products__eyebrow">
-            {{ section.settings.eyebrow }}
-          </span>
-        {% endif %}
-
-        <h2 class="trending-products__heading">
-          {{ section.settings.heading }}
-        </h2>
-
-        {% if section.settings.subheading != blank %}
-          <p class="trending-products__subheading">
-            {{ section.settings.subheading }}
-          </p>
-        {% endif %}
-
-      </div>
-    {% endif %}
-
+    <!-- =========================================
+         PRODUCTS
+    ========================================== -->
 
     <div class="trending-products__grid">
 
@@ -67,7 +48,7 @@
                       {{ product.featured_image | image_url: width: 700 }} 700w,
                       {{ product.featured_image | image_url: width: 900 }} 900w
                     "
-                    sizes="(max-width: 749px) 88vw, 25vw"
+                    sizes="(max-width: 749px) 90vw, 25vw"
                     alt="{{ product.featured_image.alt | default: product.title | escape }}"
                     loading="lazy"
                     width="{{ product.featured_image.width }}"
@@ -79,6 +60,7 @@
                   {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
 
                 {% endif %}
+
 
                 {% if section.settings.show_view_button %}
 
@@ -116,7 +98,7 @@
           <article class="trending-product-card">
 
             <div class="trending-product-card__image">
-              {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
             </div>
 
             <div class="trending-product-card__content">
@@ -139,9 +121,205 @@
 
     </div>
 
+
+    <!-- =========================================
+         CURTAIN
+    ========================================== -->
+
+    {% if section.settings.enable_animation %}
+
+      <div class="trending-curtain" aria-hidden="true">
+
+        <div class="trending-curtain__left"></div>
+
+        <div class="trending-curtain__right"></div>
+
+
+        <div class="trending-curtain__text">
+
+          {% if section.settings.eyebrow != blank %}
+
+            <span class="trending-curtain__eyebrow">
+              {{ section.settings.eyebrow }}
+            </span>
+
+          {% endif %}
+
+
+          <h2>
+            {{ section.settings.heading }}
+          </h2>
+
+
+          {% if section.settings.subheading != blank %}
+
+            <p>
+              {{ section.settings.subheading }}
+            </p>
+
+          {% endif %}
+
+        </div>
+
+
+        <div class="trending-curtain__center-line"></div>
+
+      </div>
+
+    {% endif %}
+
   </div>
 
 </section>
+
+
+<script>
+(function () {
+
+  function initTrendingCurtain() {
+
+    const section = document.getElementById(
+      'trending-products-{{ section.id }}'
+    );
+
+    if (!section) return;
+
+    if (section.dataset.trendingInitialized === 'true') {
+      return;
+    }
+
+    section.dataset.trendingInitialized = 'true';
+
+
+    {% if section.settings.enable_animation %}
+
+      let hasPlayed = false;
+
+
+      function checkSectionPosition() {
+
+        if (hasPlayed) return;
+
+
+        const rect = section.getBoundingClientRect();
+
+        const triggerPoint = window.innerHeight * 0.72;
+
+
+        /*
+          Animation starts when the TOP of the section
+          reaches approximately 72% of the viewport.
+
+          This makes it happen naturally while scrolling
+          DOWN toward the section.
+        */
+
+        if (rect.top <= triggerPoint && rect.bottom > 0) {
+
+          hasPlayed = true;
+
+          section.classList.add(
+            'trending-products--revealed'
+          );
+
+          window.removeEventListener(
+            'scroll',
+            checkSectionPosition
+          );
+
+        }
+
+      }
+
+
+      /*
+        Check once after page load.
+      */
+
+      requestAnimationFrame(function () {
+
+        checkSectionPosition();
+
+      });
+
+
+      /*
+        Watch normal page scrolling.
+      */
+
+      window.addEventListener(
+        'scroll',
+        checkSectionPosition,
+        {
+          passive: true
+        }
+      );
+
+
+      /*
+        Also check after resize.
+      */
+
+      window.addEventListener(
+        'resize',
+        checkSectionPosition,
+        {
+          passive: true
+        }
+      );
+
+    {% else %}
+
+      section.classList.add(
+        'trending-products--revealed'
+      );
+
+    {% endif %}
+
+  }
+
+
+  /*
+    Normal storefront
+  */
+
+  if (document.readyState === 'loading') {
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      initTrendingCurtain
+    );
+
+  } else {
+
+    initTrendingCurtain();
+
+  }
+
+
+  /*
+    Shopify Theme Editor
+  */
+
+  document.addEventListener(
+    'shopify:section:load',
+    function (event) {
+
+      if (
+        event.detail &&
+        event.detail.sectionId ===
+        '{{ section.id }}'
+      ) {
+
+        initTrendingCurtain();
+
+      }
+
+    }
+  );
+
+})();
+</script>
 
 
 {% schema %}
@@ -153,20 +331,32 @@
 
     {
       "type": "header",
-      "content": "Content"
+      "content": "Products"
+    },
+
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Select collection"
+    },
+
+
+    {
+      "type": "header",
+      "content": "Curtain"
     },
 
     {
       "type": "checkbox",
-      "id": "show_heading",
-      "label": "Show heading",
+      "id": "enable_animation",
+      "label": "Enable curtain animation",
       "default": true
     },
 
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow",
+      "label": "Small text",
       "default": "DISCOVER"
     },
 
@@ -181,19 +371,24 @@
       "type": "textarea",
       "id": "subheading",
       "label": "Subheading",
-      "default": "Explore our most popular products."
+      "default": "Explore what's trending right now."
     },
 
     {
-      "type": "collection",
-      "id": "collection",
-      "label": "Product collection"
+      "type": "range",
+      "id": "animation_duration",
+      "min": 0.6,
+      "max": 2.5,
+      "step": 0.1,
+      "unit": "s",
+      "label": "Curtain speed",
+      "default": 1.2
     },
 
 
     {
       "type": "header",
-      "content": "Card Layout"
+      "content": "Product Cards"
     },
 
     {
@@ -250,7 +445,7 @@
       "type": "color",
       "id": "background_color",
       "label": "Section background",
-      "default": "#F7F8FA"
+      "default": "#F6F7F9"
     },
 
     {
@@ -258,13 +453,6 @@
       "id": "card_background",
       "label": "Card background",
       "default": "#FFFFFF"
-    },
-
-    {
-      "type": "color",
-      "id": "title_color",
-      "label": "Heading color",
-      "default": "#111111"
     },
 
     {
@@ -277,32 +465,28 @@
     {
       "type": "color",
       "id": "price_color",
-      "label": "Price color",
+      "label": "Price",
       "default": "#666666"
     },
 
     {
       "type": "color",
-      "id": "accent_color",
-      "label": "Accent color",
+      "id": "curtain_color",
+      "label": "Curtain color",
       "default": "#111111"
     },
 
     {
-      "type": "range",
-      "id": "shadow_opacity",
-      "min": 0,
-      "max": 20,
-      "step": 1,
-      "unit": "%",
-      "label": "Card shadow",
-      "default": 5
+      "type": "color",
+      "id": "curtain_text_color",
+      "label": "Curtain text color",
+      "default": "#FFFFFF"
     },
 
 
     {
       "type": "header",
-      "content": "Extra"
+      "content": "Product Interaction"
     },
 
     {
