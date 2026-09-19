@@ -1,503 +1,279 @@
 {{ 'section-trending-horizontal.css' | asset_url | stylesheet_tag }}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer="defer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer="defer"></script>
-
 <section
-  id="trending-horizontal-{{ section.id }}"
-  class="trending-horizontal"
-  data-section-id="{{ section.id }}"
+  id="trending-products-{{ section.id }}"
+  class="trending-products"
   style="
-    --trending-bg: {{ section.settings.background_color }};
-    --trending-card-bg: {{ section.settings.card_background }};
-    --trending-card-width: {{ section.settings.card_width }}px;
-    --trending-image-height: {{ section.settings.image_height }}px;
-    --trending-gap: {{ section.settings.card_gap }}px;
-    --trending-radius: {{ section.settings.card_radius }}px;
-    --trending-card-padding: {{ section.settings.card_padding }}px;
-    --trending-title-size: {{ section.settings.title_size }}px;
-    --trending-title-weight: {{ section.settings.title_weight }};
-    --trending-title-color: {{ section.settings.title_color }};
-    --trending-product-title-color: {{ section.settings.product_title_color }};
-    --trending-price-color: {{ section.settings.price_color }};
-    --trending-section-height: {{ section.settings.section_height }}vh;
-    --trending-shadow-opacity: {{ section.settings.shadow_opacity | divided_by: 100.0 }};
+    --section-bg: {{ section.settings.background_color }};
+    --card-bg: {{ section.settings.card_background }};
+    --card-radius: {{ section.settings.card_radius }}px;
+    --card-gap: {{ section.settings.card_gap }}px;
+    --card-padding: {{ section.settings.card_padding }}px;
+    --image-height: {{ section.settings.image_height }}px;
+    --title-color: {{ section.settings.title_color }};
+    --product-title-color: {{ section.settings.product_title_color }};
+    --price-color: {{ section.settings.price_color }};
+    --accent-color: {{ section.settings.accent_color }};
+    --shadow-opacity: {{ section.settings.shadow_opacity | divided_by: 100.0 }};
   "
 >
-  <div class="trending-horizontal__inner">
+
+  <div class="trending-products__container">
 
     {% if section.settings.show_heading %}
-      <div class="trending-horizontal__heading">
+      <div class="trending-products__header">
+
         {% if section.settings.eyebrow != blank %}
-          <span class="trending-horizontal__eyebrow">
+          <span class="trending-products__eyebrow">
             {{ section.settings.eyebrow }}
           </span>
         {% endif %}
 
-        <h2 class="trending-horizontal__title">
+        <h2 class="trending-products__heading">
           {{ section.settings.heading }}
         </h2>
 
         {% if section.settings.subheading != blank %}
-          <p class="trending-horizontal__subtitle">
+          <p class="trending-products__subheading">
             {{ section.settings.subheading }}
           </p>
         {% endif %}
+
       </div>
     {% endif %}
 
-    <div class="trending-horizontal__viewport">
-      <div class="trending-horizontal__track">
 
-        {%- assign display_limit = section.settings.product_limit | default: 8 -%}
+    <div class="trending-products__grid">
 
-        {%- if section.settings.collection != blank -%}
+      {% if section.settings.collection != blank %}
 
-          {%- for product in section.settings.collection.products limit: display_limit -%}
+        {% for product in section.settings.collection.products limit: 4 %}
 
-            <article class="trending-product-card">
+          <article class="trending-product-card">
 
-              <a
-                href="{{ product.url }}"
-                class="trending-product-card__link"
-                aria-label="{{ product.title | escape }}"
-              >
-
-                <div class="trending-product-card__image">
-
-                  {% if product.featured_image != blank %}
-
-                    <img
-                      src="{{ product.featured_image | image_url: width: 900 }}"
-                      srcset="
-                        {{ product.featured_image | image_url: width: 450 }} 450w,
-                        {{ product.featured_image | image_url: width: 700 }} 700w,
-                        {{ product.featured_image | image_url: width: 900 }} 900w
-                      "
-                      sizes="(max-width: 749px) 72vw, {{ section.settings.card_width }}px"
-                      alt="{{ product.featured_image.alt | default: product.title | escape }}"
-                      loading="lazy"
-                      width="{{ product.featured_image.width }}"
-                      height="{{ product.featured_image.height }}"
-                    >
-
-                  {% else %}
-
-                    {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
-
-                  {% endif %}
-
-                  {% if section.settings.show_view_label %}
-                    <span class="trending-product-card__view">
-                      View product
-                    </span>
-                  {% endif %}
-
-                </div>
-
-                <div class="trending-product-card__content">
-
-                  <h3 class="trending-product-card__title">
-                    {{ product.title }}
-                  </h3>
-
-                  <div class="trending-product-card__price">
-                    {{ product.price | money }}
-                  </div>
-
-                </div>
-
-              </a>
-
-            </article>
-
-          {%- endfor -%}
-
-        {%- else -%}
-
-          {%- for i in (1..8) -%}
-
-            <article class="trending-product-card">
+            <a
+              href="{{ product.url }}"
+              class="trending-product-card__link"
+            >
 
               <div class="trending-product-card__image">
-                {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+
+                {% if product.featured_image != blank %}
+
+                  <img
+                    src="{{ product.featured_image | image_url: width: 900 }}"
+                    srcset="
+                      {{ product.featured_image | image_url: width: 500 }} 500w,
+                      {{ product.featured_image | image_url: width: 700 }} 700w,
+                      {{ product.featured_image | image_url: width: 900 }} 900w
+                    "
+                    sizes="(max-width: 749px) 88vw, 25vw"
+                    alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                    loading="lazy"
+                    width="{{ product.featured_image.width }}"
+                    height="{{ product.featured_image.height }}"
+                  >
+
+                {% else %}
+
+                  {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+
+                {% endif %}
+
+                {% if section.settings.show_view_button %}
+
+                  <span class="trending-product-card__view">
+                    View Product
+                  </span>
+
+                {% endif %}
+
               </div>
+
 
               <div class="trending-product-card__content">
 
                 <h3 class="trending-product-card__title">
-                  Product {{ i }}
+                  {{ product.title }}
                 </h3>
 
                 <div class="trending-product-card__price">
-                  $4,500.00
+                  {{ product.price | money }}
                 </div>
 
               </div>
 
-            </article>
+            </a>
 
-          {%- endfor -%}
+          </article>
 
-        {%- endif -%}
+        {% endfor %}
 
-      </div>
+      {% else %}
+
+        {% for i in (1..4) %}
+
+          <article class="trending-product-card">
+
+            <div class="trending-product-card__image">
+              {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            </div>
+
+            <div class="trending-product-card__content">
+
+              <h3 class="trending-product-card__title">
+                Product {{ i }}
+              </h3>
+
+              <div class="trending-product-card__price">
+                $0.00
+              </div>
+
+            </div>
+
+          </article>
+
+        {% endfor %}
+
+      {% endif %}
+
     </div>
 
-    {% if section.settings.show_scroll_hint %}
-      <div class="trending-horizontal__scroll-hint">
-        <span>{{ section.settings.scroll_hint }}</span>
-        <span class="trending-horizontal__scroll-line">
-          <span></span>
-        </span>
-      </div>
-    {% endif %}
-
-    {% if section.settings.show_progress %}
-      <div class="trending-horizontal__progress">
-        <span></span>
-      </div>
-    {% endif %}
-
   </div>
+
 </section>
 
-<script>
-(function() {
-  const sectionId = 'trending-horizontal-{{ section.id }}';
-
-  function initTrendingSection() {
-    const section = document.getElementById(sectionId);
-
-    if (!section || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-      return;
-    }
-
-    if (section.dataset.initialized === 'true') {
-      return;
-    }
-
-    section.dataset.initialized = 'true';
-
-    gsap.registerPlugin(ScrollTrigger);
-
-    const heading = section.querySelector('.trending-horizontal__heading');
-    const track = section.querySelector('.trending-horizontal__track');
-    const cards = section.querySelectorAll('.trending-product-card');
-    const progress = section.querySelector('.trending-horizontal__progress span');
-    const scrollHint = section.querySelector('.trending-horizontal__scroll-hint');
-
-    if (!track || !cards.length) {
-      return;
-    }
-
-    const getDistance = () => {
-      const viewportWidth = section.querySelector('.trending-horizontal__viewport').clientWidth;
-      const trackWidth = track.scrollWidth;
-
-      return Math.max(0, trackWidth - viewportWidth);
-    };
-
-    const animationDuration = {{ section.settings.animation_duration }};
-    const pinDuration = {{ section.settings.pin_duration }};
-
-    const ctx = gsap.context(() => {
-
-      gsap.set(cards, {
-        opacity: 0,
-        y: 70,
-        scale: 0.92
-      });
-
-      if (heading) {
-        gsap.set(heading, {
-          opacity: 1,
-          y: 0
-        });
-      }
-
-      const intro = gsap.timeline();
-
-      if (heading) {
-        intro.to(heading, {
-          y: -{{ section.settings.heading_exit_distance }},
-          opacity: 0,
-          duration: 0.8,
-          ease: 'power3.inOut'
-        });
-      }
-
-      intro.to(cards, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.8,
-        stagger: 0.08,
-        ease: 'power3.out'
-      }, '-=0.45');
-
-      if (scrollHint) {
-        intro.to(scrollHint, {
-          opacity: 0,
-          y: 20,
-          duration: 0.4
-        }, '-=0.5');
-      }
-
-      const horizontalTween = gsap.to(track, {
-        x: () => -getDistance(),
-        ease: 'none',
-        duration: animationDuration
-      });
-
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: () => '+=' + pinDuration,
-        pin: true,
-        scrub: {{ section.settings.scrub }},
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        animation: gsap.timeline()
-          .add(intro)
-          .add(horizontalTween, '+=0.05'),
-        onUpdate: self => {
-          if (progress) {
-            progress.style.transform = 'scaleX(' + self.progress + ')';
-          }
-        }
-      });
-
-      cards.forEach(card => {
-        const image = card.querySelector('.trending-product-card__image img');
-
-        if (!image) return;
-
-        card.addEventListener('mouseenter', () => {
-          gsap.to(card, {
-            y: -10,
-            duration: 0.35,
-            ease: 'power2.out',
-            overwrite: true
-          });
-
-          gsap.to(image, {
-            scale: 1.045,
-            duration: 0.5,
-            ease: 'power2.out',
-            overwrite: true
-          });
-        });
-
-        card.addEventListener('mouseleave', () => {
-          gsap.to(card, {
-            y: 0,
-            duration: 0.35,
-            ease: 'power2.out',
-            overwrite: true
-          });
-
-          gsap.to(image, {
-            scale: 1,
-            duration: 0.5,
-            ease: 'power2.out',
-            overwrite: true
-          });
-        });
-      });
-
-      ScrollTrigger.refresh();
-
-    }, section);
-
-    document.addEventListener('shopify:section:unload', function(event) {
-      if (event.detail.sectionId === '{{ section.id }}') {
-        ctx.revert();
-        section.dataset.initialized = 'false';
-      }
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTrendingSection);
-  } else {
-    initTrendingSection();
-  }
-
-  document.addEventListener('shopify:section:load', function(event) {
-    if (event.detail.sectionId === '{{ section.id }}') {
-      initTrendingSection();
-    }
-  });
-})();
-</script>
 
 {% schema %}
+
 {
-  "name": "Trending Horizontal",
+  "name": "Trending Products",
+
   "settings": [
+
     {
       "type": "header",
       "content": "Content"
     },
+
     {
       "type": "checkbox",
       "id": "show_heading",
       "label": "Show heading",
       "default": true
     },
+
     {
       "type": "text",
       "id": "eyebrow",
       "label": "Eyebrow",
       "default": "DISCOVER"
     },
+
     {
       "type": "text",
       "id": "heading",
-      "label": "Section heading",
+      "label": "Heading",
       "default": "TRENDING PRODUCTS"
     },
+
     {
       "type": "textarea",
       "id": "subheading",
       "label": "Subheading",
-      "default": "Explore what's trending right now."
-    },
-    {
-      "type": "collection",
-      "id": "collection",
-      "label": "Select collection"
-    },
-    {
-      "type": "range",
-      "id": "product_limit",
-      "min": 4,
-      "max": 12,
-      "step": 1,
-      "label": "Maximum products",
-      "default": 8
+      "default": "Explore our most popular products."
     },
 
     {
+      "type": "collection",
+      "id": "collection",
+      "label": "Product collection"
+    },
+
+
+    {
       "type": "header",
-      "content": "Layout"
+      "content": "Card Layout"
     },
-    {
-      "type": "range",
-      "id": "section_height",
-      "min": 80,
-      "max": 120,
-      "step": 5,
-      "unit": "%",
-      "label": "Section height",
-      "default": 100
-    },
-    {
-      "type": "range",
-      "id": "card_width",
-      "min": 240,
-      "max": 420,
-      "step": 10,
-      "unit": "px",
-      "label": "Card width",
-      "default": 310
-    },
-    {
-      "type": "range",
-      "id": "image_height",
-      "min": 280,
-      "max": 520,
-      "step": 10,
-      "unit": "px",
-      "label": "Image height",
-      "default": 390
-    },
+
     {
       "type": "range",
       "id": "card_gap",
-      "min": 12,
-      "max": 60,
+      "min": 10,
+      "max": 50,
       "step": 2,
       "unit": "px",
       "label": "Card spacing",
-      "default": 28
+      "default": 24
     },
+
     {
       "type": "range",
       "id": "card_padding",
-      "min": 8,
-      "max": 28,
+      "min": 6,
+      "max": 24,
       "step": 2,
       "unit": "px",
       "label": "Card padding",
-      "default": 14
+      "default": 12
     },
+
     {
       "type": "range",
       "id": "card_radius",
       "min": 8,
-      "max": 40,
+      "max": 36,
       "step": 2,
       "unit": "px",
       "label": "Card radius",
-      "default": 22
+      "default": 20
     },
 
     {
-      "type": "header",
-      "content": "Typography"
-    },
-    {
       "type": "range",
-      "id": "title_size",
-      "min": 32,
-      "max": 100,
-      "step": 2,
+      "id": "image_height",
+      "min": 250,
+      "max": 500,
+      "step": 10,
       "unit": "px",
-      "label": "Heading size",
-      "default": 68
+      "label": "Image height",
+      "default": 360
     },
+
+
     {
-      "type": "select",
-      "id": "title_weight",
-      "label": "Heading weight",
-      "options": [
-        {
-          "value": "500",
-          "label": "Medium"
-        },
-        {
-          "value": "600",
-          "label": "Semi-bold"
-        },
-        {
-          "value": "700",
-          "label": "Bold"
-        },
-        {
-          "value": "800",
-          "label": "Extra bold"
-        },
-        {
-          "value": "900",
-          "label": "Black"
-        }
-      ],
-      "default": "800"
+      "type": "header",
+      "content": "Colors"
     },
+
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "default": "#F7F8FA"
+    },
+
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#FFFFFF"
+    },
+
     {
       "type": "color",
       "id": "title_color",
       "label": "Heading color",
       "default": "#111111"
     },
+
     {
       "type": "color",
       "id": "product_title_color",
-      "label": "Product title color",
+      "label": "Product title",
       "default": "#222222"
     },
+
     {
       "type": "color",
       "id": "price_color",
@@ -506,21 +282,12 @@
     },
 
     {
-      "type": "header",
-      "content": "Colors"
-    },
-    {
       "type": "color",
-      "id": "background_color",
-      "label": "Section background",
-      "default": "#F6F7F9"
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#111111"
     },
-    {
-      "type": "color",
-      "id": "card_background",
-      "label": "Card background",
-      "default": "#FFFFFF"
-    },
+
     {
       "type": "range",
       "id": "shadow_opacity",
@@ -532,83 +299,27 @@
       "default": 5
     },
 
-    {
-      "type": "header",
-      "content": "Animation"
-    },
-    {
-      "type": "range",
-      "id": "animation_duration",
-      "min": 2,
-      "max": 8,
-      "step": 0.5,
-      "unit": "s",
-      "label": "Horizontal animation",
-      "default": 4
-    },
-    {
-      "type": "range",
-      "id": "pin_duration",
-      "min": 1800,
-      "max": 6000,
-      "step": 100,
-      "unit": "px",
-      "label": "Scroll distance",
-      "default": 3600
-    },
-    {
-      "type": "range",
-      "id": "scrub",
-      "min": 0.1,
-      "max": 2,
-      "step": 0.1,
-      "label": "Scroll smoothness",
-      "default": 0.8
-    },
-    {
-      "type": "range",
-      "id": "heading_exit_distance",
-      "min": 50,
-      "max": 250,
-      "step": 10,
-      "unit": "px",
-      "label": "Heading exit distance",
-      "default": 110
-    },
 
     {
       "type": "header",
-      "content": "Extra UI"
+      "content": "Extra"
     },
+
     {
       "type": "checkbox",
-      "id": "show_view_label",
-      "label": "Show 'View product' on hover",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_scroll_hint",
-      "label": "Show scroll hint",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "scroll_hint",
-      "label": "Scroll hint text",
-      "default": "SCROLL TO EXPLORE"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_progress",
-      "label": "Show scroll progress",
+      "id": "show_view_button",
+      "label": "Show View Product on hover",
       "default": true
     }
+
   ],
+
   "presets": [
     {
-      "name": "Trending Horizontal"
+      "name": "Trending Products"
     }
   ]
+
 }
+
 {% endschema %}
